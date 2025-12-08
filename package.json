@@ -43,8 +43,12 @@
     "clean": "shx mkdir -p dist && shx rm -rf dist",
     "package": "shx echo '{ \"type\": \"commonjs\" }' > dist/cjs/package.json"
   },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
   "devDependencies": {
     "@types/node": "^20.14.11",
+    "@types/node-fetch": "^2.6.11",
     "shx": "^0.4.0",
     "typescript": "^5.5.3"
   }

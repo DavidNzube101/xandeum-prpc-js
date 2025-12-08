@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 export interface Pod {
   address?: string;
   last_seen_timestamp: number;
@@ -80,7 +82,7 @@ export class PrpcClient {
         throw new PrpcError(`HTTP error: ${response.status}`);
       }
 
-      const rpcResponse: RpcResponse<T> = await response.json();
+      const rpcResponse = await response.json() as RpcResponse<T>;
 
       if (rpcResponse.error) {
         throw new PrpcError(rpcResponse.error.message);
