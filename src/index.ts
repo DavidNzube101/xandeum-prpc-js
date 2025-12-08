@@ -62,29 +62,42 @@ export class PrpcClient {
       id: 1,
     };
 
-    const response = await fetch(this.baseUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(request),
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
-    if (!response.ok) {
-      throw new PrpcError(`HTTP error: ${response.status}`);
+    try {
+      const response = await fetch(this.baseUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new PrpcError(`HTTP error: ${response.status}`);
+      }
+
+      const rpcResponse: RpcResponse<T> = await response.json();
+
+      if (rpcResponse.error) {
+        throw new PrpcError(rpcResponse.error.message);
+      }
+
+      if (!rpcResponse.result) {
+        throw new PrpcError('No result in response');
+      }
+
+      return rpcResponse.result;
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        throw new PrpcError('Request timed out');
+      }
+      throw error;
     }
-
-    const rpcResponse: RpcResponse<T> = await response.json();
-
-    if (rpcResponse.error) {
-      throw new PrpcError(rpcResponse.error.message);
-    }
-
-    if (!rpcResponse.result) {
-      throw new PrpcError('No result in response');
-    }
-
-    return rpcResponse.result;
   }
 
   async getPods(): Promise<PodsResponse> {
