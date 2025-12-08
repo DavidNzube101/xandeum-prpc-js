@@ -68,6 +68,7 @@ export class PrpcClient {
     const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
     try {
+      const { default: fetch } = await import('node-fetch');
       const response = await fetch(this.baseUrl, {
         method: 'POST',
         headers: {
