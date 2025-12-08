@@ -1,0 +1,51 @@
+{
+  "name": "xandeum-prpc",
+  "version": "0.1.0",
+  "description": "JavaScript/TypeScript client for Xandeum pNode pRPC APIs",
+  "author": "David Nzube (Skipp)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-repo/xandeum-prpc-js.git"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist/",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    }
+  },
+  "scripts": {
+    "build": "npm run clean && npm run build:esm && npm run build:cjs && npm run postbuild && npm run package",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "postbuild": "node add-js-extensions.js",
+    "clean": "shx mkdir -p dist && shx rm -rf dist",
+    "package": "shx echo '{ \"type\": \"commonjs\" }' > dist/cjs/package.json"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.11",
+    "shx": "^0.4.0",
+    "typescript": "^5.5.3"
+  }
+}
