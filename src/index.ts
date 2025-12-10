@@ -2,8 +2,14 @@ import fetch from 'node-fetch';
 
 export interface Pod {
   address?: string;
+  is_public?: boolean;
   last_seen_timestamp: number;
   pubkey?: string;
+  rpc_port?: number;
+  storage_committed?: number;
+  storage_usage_percent?: number;
+  storage_used?: number;
+  uptime?: number;
   version?: string;
 }
 
@@ -105,6 +111,10 @@ export class PrpcClient {
 
   async getPods(): Promise<PodsResponse> {
     return this.call<PodsResponse>('get-pods');
+  }
+
+  async getPodsWithStats(): Promise<PodsResponse> {
+    return this.call<PodsResponse>('get-pods-with-stats');
   }
 
   async getStats(): Promise<NodeStats> {

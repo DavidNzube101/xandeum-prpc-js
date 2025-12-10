@@ -1,11 +1,11 @@
 {
   "name": "xandeum-prpc",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "JavaScript/TypeScript client for Xandeum pNode pRPC APIs",
   "author": "David Nzube (Skipp)",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/your-repo/xandeum-prpc-js.git"
+    "url": "git+https://github.com/DavidNzube101/xandeum-prpc-js.git"
   },
   "license": "MIT",
   "publishConfig": {
