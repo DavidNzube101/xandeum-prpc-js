@@ -58,9 +58,22 @@ export class PrpcError extends Error {
 
 export class PrpcClient {
   private baseUrl: string;
+  private timeout: number;
 
-  constructor(ip: string) {
+  static defaultSeedIps: string[] = [
+    "173.212.220.65",
+    "161.97.97.41",
+    "192.190.136.36",
+    "192.190.136.38",
+    "207.244.255.1",
+    "192.190.136.28",
+    "192.190.136.29",
+    "173.212.203.145",
+  ];
+
+  constructor(ip: string, options?: { timeout?: number }) {
     this.baseUrl = `http://${ip}:6000/rpc`;
+    this.timeout = options?.timeout || 5000;
   }
 
   private async call<T>(method: string): Promise<T> {
@@ -71,7 +84,7 @@ export class PrpcClient {
     };
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
     try {
       const { default: fetch } = await import('node-fetch');
@@ -108,6 +121,47 @@ export class PrpcClient {
       throw error;
     }
   }
+
+  static async findPNode(
+    nodeId: string,
+    options?: {
+      addSeeds?: string[];
+      replaceSeeds?: string[];
+      timeout?: number;
+    }
+  ): Promise<Pod> {
+    let seeds = PrpcClient.defaultSeedIps;
+    if (options?.replaceSeeds) {
+      seeds = options.replaceSeeds;
+    } else if (options?.addSeeds) {
+      seeds = [...seeds, ...options.addSeeds];
+    }
+
+    const findPromises = seeds.map(seedIp => {
+      return new Promise<Pod>(async (resolve, reject) => {
+        try {
+          const client = new PrpcClient(seedIp, { timeout: options?.timeout });
+          const podsResponse = await client.getPods();
+          const found = podsResponse.pods.find(p => p.pubkey === nodeId);
+          if (found) {
+            resolve(found);
+          } else {
+            reject(new Error(`Node not found on seed ${seedIp}`));
+          }
+        } catch (error) {
+          reject(error);
+        }
+      });
+    });
+
+    try {
+      const result = await Promise.any(findPromises);
+      return result;
+    } catch (error) {
+      throw new PrpcError(`Could not find pNode ${nodeId} on any of the provided seeds.`);
+    }
+  }
+
 
   async getPods(): Promise<PodsResponse> {
     return this.call<PodsResponse>('get-pods');
