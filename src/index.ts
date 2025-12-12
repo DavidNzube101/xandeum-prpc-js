@@ -56,6 +56,12 @@ export class PrpcError extends Error {
   }
 }
 
+export interface FindPNodeOptions {
+  addSeeds?: string[];
+  replaceSeeds?: string[];
+  timeout?: number;
+}
+
 export class PrpcClient {
   private baseUrl: string;
   private timeout: number;
@@ -124,11 +130,7 @@ export class PrpcClient {
 
   static async findPNode(
     nodeId: string,
-    options?: {
-      addSeeds?: string[];
-      replaceSeeds?: string[];
-      timeout?: number;
-    }
+    options?: FindPNodeOptions
   ): Promise<Pod> {
     let seeds = PrpcClient.defaultSeedIps;
     if (options?.replaceSeeds) {
