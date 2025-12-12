@@ -1,6 +1,6 @@
 {
   "name": "xandeum-prpc",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "JavaScript/TypeScript client for Xandeum pNode pRPC APIs",
   "author": "David Nzube (Skipp)",
   "repository": {
